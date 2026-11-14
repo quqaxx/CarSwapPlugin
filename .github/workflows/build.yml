@@ -35,8 +35,20 @@ jobs:
           dotnet-version: "11.0.x"
           dotnet-quality: "preview"
 
+      - name: Depodaki dosyalari goster
+        run: find plugin-repo -not -path "*/.git/*" -type f
+
       - name: Plugini AssettoServer/Plugins icine koy
-        run: cp -r plugin-repo/CarSwapPlugin AssettoServer/Plugins/CarSwapPlugin
+        run: |
+          CSPROJ=$(find plugin-repo -name "CarSwapPlugin.csproj" -not -path "*/.git/*" | head -n 1)
+          if [ -z "$CSPROJ" ]; then
+            echo "CarSwapPlugin.csproj depoda bulunamadi. Yukaridaki dosya listesine bak."
+            exit 1
+          fi
+          SRC=$(dirname "$CSPROJ")
+          echo "Plugin klasoru: $SRC"
+          mkdir -p AssettoServer/Plugins/CarSwapPlugin
+          cp -r "$SRC"/. AssettoServer/Plugins/CarSwapPlugin/
 
       - name: Derle
         working-directory: AssettoServer
